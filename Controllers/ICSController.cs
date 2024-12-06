@@ -56,16 +56,24 @@ namespace ITCCLMBSSA_API.Controllers{
             var SPcontr = new SubProgramma();
             //Haalt bearer token op
             var Bearer = await XOAcontr.GetBearerToken();
-            if(postItem.attendees.Contains(Bearer.userName)){
-                postItem.attendees.Add(Bearer.userName);
+            if(postItem.attendees.Select(x => x.email).Contains(Bearer.userName)){
+                postItem.attendees.Add(new PostAttendee{
+                    email = Bearer.userName,
+                    needTravelTime = true});
             }
             var availability =  new Availability{
                 datum = postItem.startTime.Date,
                 startTijd = postItem.startTime.TimeOfDay,
                 eindTijd = postItem.endTime.TimeOfDay,
-                attendees = postItem.attendees,
+                attendees = postItem.attendees.Select(x => x.email).ToList(),
             };
-            var list = await SPcontr.PostEvent(postItem.subject, postItem.content, availability, postItem.isOnlineMeeting, postItem.Location, postItem.travelTime, XOAcontr, Bearer);
+            var travelList = new List<string>();
+            foreach(var item in postItem.attendees){
+                if(item.needTravelTime){
+                    travelList.Add(item.email);
+                }
+            }
+            var list = await SPcontr.PostEvent(postItem.subject, postItem.content, availability, postItem.isOnlineMeeting, postItem.Location, postItem.travelTime, XOAcontr, Bearer, travelList);
             
 
             return Ok(list);

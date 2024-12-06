@@ -29,7 +29,7 @@ public class SubProgramma{
             }
             else{
                 int i = 1;
-                ITCCLMBSSA_API.Models.GetSchedule.ScheduleItem prev = null;
+                ScheduleItem prev = null;
                 foreach(var sched in item.scheduleItems){
                     if(sched.end.dateTime.TimeOfDay.Hours == 16){
                     }
@@ -226,7 +226,7 @@ public class SubProgramma{
     public  ITCCLMBSSA_API.Models.PostEvent.Post PItem(Availability meeting, string subject, string body, bool online, string location, string showAs){
         var item = new ITCCLMBSSA_API.Models.PostEvent.Post(){
             subject = subject,
-            body = new ITCCLMBSSA_API.Models.PostEvent.BodyType(){
+            body = new BodyType(){
                 contentType = "html",
                 content = body,
             },
@@ -238,10 +238,10 @@ public class SubProgramma{
                 dateTime = DateTime.Parse(meeting.datum.ToString("d") + " " + meeting.eindTijd),
                 timeZone = "W. Europe Standard Time",
             },
-            location = new ITCCLMBSSA_API.Models.PostEvent.Location(){
+            location = new Location(){
                 displayName = location
             },
-            attendees = new List<ITCCLMBSSA_API.Models.PostEvent.Attendees>(),
+            attendees = new List<Attendees>(),
             allowNewTimeProposals = true,
             isOnlineMeeting = online,
             onlineMeetingProvider = online ? "teamsForBusiness" : null,
@@ -250,9 +250,9 @@ public class SubProgramma{
 
         foreach(var at in meeting.attendees){
         
-            item.attendees.Add(new ITCCLMBSSA_API.Models.PostEvent.Attendees(){
+            item.attendees.Add(new Attendees(){
                 type = "required",
-                emailAddress = new ITCCLMBSSA_API.Models.PostEvent.MailName(){
+                emailAddress = new MailName(){
                     address = at,
                     name = "naam",
                 }
@@ -263,11 +263,18 @@ public class SubProgramma{
     }
 
 
-    public async Task<List<ITCCLMBSSA_API.Models.PostEvent.Return>> PostEvent(string onderwerp, string body, ITCCLMBSSA_API.Models.misc.Availability gekozenTijdstip, bool online, string locatie, TimeSpan tijdWeg, XOutlookApiController contr, AccessTokenReturn Bearer){
+    public async Task<List<ITCCLMBSSA_API.Models.PostEvent.Return>> PostEvent(string onderwerp, string body, ITCCLMBSSA_API.Models.misc.Availability gekozenTijdstip, bool online, string locatie, TimeSpan tijdWeg, XOutlookApiController contr, AccessTokenReturn Bearer, List<string> travelList){
                     //Data formatteren voor Outlook API
                     var pEvent = PItem(gekozenTijdstip, onderwerp, body, online, locatie, "busy");
-                    var i = await PostTravelTime(gekozenTijdstip, tijdWeg , onderwerp, body, contr, Bearer);
+
+                    //Losse event maken voor mensen van ITC die reistijd nodig hebben
+                    var newAva = gekozenTijdstip;
+                    newAva.attendees = travelList;
+
+                    //Reistijd & Workshop events publiceren
+                    var i = await PostTravelTime(newAva, tijdWeg , onderwerp, body, contr, Bearer);
                     var postEvent = await contr.PostEvent(pEvent, Bearer.AccessToken);
+
                     if(postEvent == null){
                         throw new Exception("Onbekende foutmelding");
                     }

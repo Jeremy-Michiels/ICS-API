@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
+using ITCCLMBSSA_API.Models.misc;
 
 namespace ITCCLMBSSA_API.Models.PostEvent{
     public class APIPost{
@@ -13,7 +14,7 @@ namespace ITCCLMBSSA_API.Models.PostEvent{
         public DateTime endTime{get;set;}
         [DefaultValue("Locatie")]
         public string Location{get;set;}
-        public List<string> attendees{get;set;}
+        public List<PostAttendee> attendees{get;set;}
         [DefaultValue(false)]
         public bool isOnlineMeeting{get;set;}
         [DefaultValue("00:00:00")]
