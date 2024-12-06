@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\jerem\\OneDrive\\Bureaublad\\School\\Stage\\2024\\Code\\API\\ITCCLMBSSA-API\\ITCCLMBSSA-API.csproj": {}
+    "C:\\Users\\jerem\\OneDrive\\Bureaublad\\School\\Stage\\2024\\Code\\API\\ITCCLMBSSA-API\\ITCCLMBSSA-API.csproj": {}
   },
   "projects": {
-    "c:\\Users\\jerem\\OneDrive\\Bureaublad\\School\\Stage\\2024\\Code\\API\\ITCCLMBSSA-API\\ITCCLMBSSA-API.csproj": {
+    "C:\\Users\\jerem\\OneDrive\\Bureaublad\\School\\Stage\\2024\\Code\\API\\ITCCLMBSSA-API\\ITCCLMBSSA-API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\jerem\\OneDrive\\Bureaublad\\School\\Stage\\2024\\Code\\API\\ITCCLMBSSA-API\\ITCCLMBSSA-API.csproj",
+        "projectUniqueName": "C:\\Users\\jerem\\OneDrive\\Bureaublad\\School\\Stage\\2024\\Code\\API\\ITCCLMBSSA-API\\ITCCLMBSSA-API.csproj",
         "projectName": "ITCCLMBSSA-API",
-        "projectPath": "c:\\Users\\jerem\\OneDrive\\Bureaublad\\School\\Stage\\2024\\Code\\API\\ITCCLMBSSA-API\\ITCCLMBSSA-API.csproj",
+        "projectPath": "C:\\Users\\jerem\\OneDrive\\Bureaublad\\School\\Stage\\2024\\Code\\API\\ITCCLMBSSA-API\\ITCCLMBSSA-API.csproj",
         "packagesPath": "C:\\Users\\jerem\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\jerem\\OneDrive\\Bureaublad\\School\\Stage\\2024\\Code\\API\\ITCCLMBSSA-API\\obj\\",
+        "outputPath": "C:\\Users\\jerem\\OneDrive\\Bureaublad\\School\\Stage\\2024\\Code\\API\\ITCCLMBSSA-API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\jerem\\AppData\\Roaming\\NuGet\\NuGet.Config"

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "YhmqGL41mAQ=",
+  "dgSpecHash": "QuaK4cPc2yA=",
   "success": true,
-  "projectFilePath": "c:\\Users\\jerem\\OneDrive\\Bureaublad\\School\\Stage\\2024\\Code\\API\\ITCCLMBSSA-API\\ITCCLMBSSA-API.csproj",
+  "projectFilePath": "C:\\Users\\jerem\\OneDrive\\Bureaublad\\School\\Stage\\2024\\Code\\API\\ITCCLMBSSA-API\\ITCCLMBSSA-API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\jerem\\.nuget\\packages\\flurl\\4.0.0\\flurl.4.0.0.nupkg.sha512",
     "C:\\Users\\jerem\\.nuget\\packages\\flurl.http\\4.0.2\\flurl.http.4.0.2.nupkg.sha512",
