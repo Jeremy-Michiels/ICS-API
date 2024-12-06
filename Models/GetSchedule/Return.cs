@@ -1,6 +1,7 @@
+using ITCCLMBSSA_API.Models.misc;
+
 namespace ITCCLMBSSA_API.Models.GetSchedule{
     public class Return{
-        public string odataContext{get;set;}
         public List<RetItem> value{get;set;}
     }
 }

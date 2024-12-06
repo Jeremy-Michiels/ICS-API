@@ -1,7 +1,5 @@
 
-using ITCCLMBSSA_API.Models.misc;
-
-namespace ITCCLMBSSA_API.Models.GetSchedule{
+namespace ITCCLMBSSA_API.Models.misc{
     public class RetItem{
         public string scheduleId{get;set;}
         public string availabilityView{get;set;}

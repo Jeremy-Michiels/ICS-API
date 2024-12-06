@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Flurl.Http;
 using ITCCLMBSSA_API.Models;
+using ITCCLMBSSA_API.Models.misc;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;

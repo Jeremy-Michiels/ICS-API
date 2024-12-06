@@ -1,4 +1,4 @@
-namespace ITCCLMBSSA_API.Models.PostEvent{
+namespace ITCCLMBSSA_API.Models.misc{
     public class LocationType{
         public string displayName{get;set;}
         public string locationType{get;set;}
