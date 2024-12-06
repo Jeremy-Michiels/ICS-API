@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\ITCCLMBSSA-API.props" />
-</Project>
