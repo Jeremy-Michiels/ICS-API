@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>ITCCLMBSSA_API</RootNamespace>
+    <NoWarn>8600,8601,8602,8603,8604,8618</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
