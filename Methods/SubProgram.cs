@@ -13,7 +13,7 @@ public class SubProgramma{
         var disDates = new List<DateTime>();
         disDates.Add(startDate);
         var btw = startDate.AddDays(1);
-        while(btw.Date > endDate.Date){
+        while(btw.Date < endDate.Date){
             disDates.Add(btw);
             btw = btw.AddDays(1);
         }
@@ -24,7 +24,7 @@ public class SubProgramma{
         foreach(var item in ret.value){
             if(item.scheduleItems.Count() < 1){
                 foreach(var date in disDates){
-                    compareList.Add(CompareAdd(item.scheduleId, date,item.workingHours.startTijd,item.workingHours.eindTijd));
+                    compareList.Add(CompareAdd(item.scheduleId, date,item.workingHours.startTime,item.workingHours.endTime));
                 }
             }
             else{
@@ -34,8 +34,8 @@ public class SubProgramma{
                     if(sched.end.dateTime.TimeOfDay.Hours == 16){
                     }
                     if(prev == null && i == 1){
-                        if(sched.start.dateTime.TimeOfDay > item.workingHours.startTijd){
-                            compareList.Add(CompareAdd(item.scheduleId, sched.start.dateTime.Date,item.workingHours.startTijd,sched.start.dateTime.TimeOfDay));
+                        if(sched.start.dateTime.TimeOfDay > item.workingHours.startTime){
+                            compareList.Add(CompareAdd(item.scheduleId, sched.start.dateTime.Date,item.workingHours.startTime,sched.start.dateTime.TimeOfDay));
                         }
                     }
                     
@@ -43,17 +43,17 @@ public class SubProgramma{
                         if(sched.start.dateTime.Date == prev.end.dateTime.Date){
                             if(sched.start.dateTime.TimeOfDay > prev.end.dateTime.TimeOfDay){
                                 compareList.Add(CompareAdd(item.scheduleId, prev.end.dateTime.Date,prev.end.dateTime.TimeOfDay,sched.start.dateTime.TimeOfDay));                                
-                                if(i == item.scheduleItems.Count() && sched.end.dateTime.TimeOfDay < item.workingHours.eindTijd){
-                                    compareList.Add(CompareAdd(item.scheduleId, sched.start.dateTime.Date,sched.end.dateTime.TimeOfDay,item.workingHours.eindTijd));                                    
+                                if(i == item.scheduleItems.Count() && sched.end.dateTime.TimeOfDay < item.workingHours.endTime){
+                                    compareList.Add(CompareAdd(item.scheduleId, sched.start.dateTime.Date,sched.end.dateTime.TimeOfDay,item.workingHours.endTime));                                    
                                 }
                             }
                         }
                         else{
-                            if(prev.end.dateTime.TimeOfDay < item.workingHours.eindTijd){
-                                compareList.Add(CompareAdd(item.scheduleId, prev.end.dateTime.Date,prev.end.dateTime.TimeOfDay,item.workingHours.eindTijd));                                
+                            if(prev.end.dateTime.TimeOfDay < item.workingHours.endTime){
+                                compareList.Add(CompareAdd(item.scheduleId, prev.end.dateTime.Date,prev.end.dateTime.TimeOfDay,item.workingHours.endTime));                                
                             }
-                            if(sched.start.dateTime.TimeOfDay > item.workingHours.startTijd){
-                                compareList.Add(CompareAdd(item.scheduleId, sched.start.dateTime.Date,item.workingHours.eindTijd,sched.start.dateTime.TimeOfDay));                                
+                            if(sched.start.dateTime.TimeOfDay > item.workingHours.startTime){
+                                compareList.Add(CompareAdd(item.scheduleId, sched.start.dateTime.Date,item.workingHours.endTime,sched.start.dateTime.TimeOfDay));                                
                             }
                         }
                     }
@@ -96,7 +96,7 @@ public class SubProgramma{
 
                 foreach (var busyTimes in planned){
                     //Checken of de tijden van de meeting overlappen met deze vrijgeroosterde tijd
-                    if((busyTimes.start.dateTime.TimeOfDay < item.startTijd && busyTimes.end.dateTime.TimeOfDay > item.startTijd) || (busyTimes.start.dateTime.TimeOfDay < item.eindTijd && busyTimes.end.dateTime.TimeOfDay > item.eindTijd) || (busyTimes.start.dateTime.TimeOfDay > item.startTijd && busyTimes.end.dateTime.TimeOfDay < item.eindTijd) || (busyTimes.start.dateTime.TimeOfDay < item.startTijd && busyTimes.end.dateTime.TimeOfDay > item.eindTijd)){
+                    if((busyTimes.start.dateTime.TimeOfDay <= item.startTijd && busyTimes.end.dateTime.TimeOfDay >= item.startTijd) || (busyTimes.start.dateTime.TimeOfDay <= item.eindTijd && busyTimes.end.dateTime.TimeOfDay >= item.eindTijd) || (busyTimes.start.dateTime.TimeOfDay >= item.startTijd && busyTimes.end.dateTime.TimeOfDay <= item.eindTijd) || (busyTimes.start.dateTime.TimeOfDay <= item.startTijd && busyTimes.end.dateTime.TimeOfDay >= item.eindTijd)){
                                     i = 0;
                                     break;
 
@@ -195,11 +195,8 @@ public class SubProgramma{
 
 
     //Vraagt om alle emails van mensen die tot de meeting behoren, en de tijden van de meeting, en formateert dit voor de Outlook API call
-    public  ITCCLMBSSA_API.Models.GetSchedule.Post EmailPost(string activeEmail, APIAvailability availability){
-        var emails = new List<string>
-        {
-            activeEmail
-        };
+    public  ITCCLMBSSA_API.Models.GetSchedule.Post EmailPost( APIAvailability availability){
+        var emails = new List<string>();
         foreach(var e in availability.emails){
             emails.Add(e);
         }

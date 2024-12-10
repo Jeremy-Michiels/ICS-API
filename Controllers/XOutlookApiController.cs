@@ -21,6 +21,7 @@ namespace ITCCLMBSSA_API.Controllers{
             Console.WriteLine("App Gemaakt");
             string[] scopes = 
             {
+                "https://graph.microsoft.com/calendars.readwrite",
                 "https://graph.microsoft.com/user.read"
             };
 
@@ -45,7 +46,7 @@ namespace ITCCLMBSSA_API.Controllers{
         internal async Task<Models.GetSchedule.Return> GetSchedule(Models.GetSchedule.Post postItem, [FromHeader] string Bearer){
             string json = await Flurl.Url.Parse("https://graph.microsoft.com/v1.0/me/calendar/getschedule")
                     .WithOAuthBearerToken(Bearer)
-                    .WithHeader("Prefer", "outlook.timezone=" + (char)34 + "Pacific Standard Time"+ (char)34)
+                    .WithHeader("Prefer", "outlook.timezone=" + (char)34 + "W. Europe Standard Time"+ (char)34)
                     .PostJsonAsync(postItem)
                     .ReceiveString();
             var item = JsonSerializer.Deserialize<Models.GetSchedule.Return>(json);

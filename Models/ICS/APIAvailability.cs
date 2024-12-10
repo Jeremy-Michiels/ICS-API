@@ -8,9 +8,9 @@ namespace ITCCLMBSSA_API.Models{
         public DateTime StartTime{get;set;}
         [DefaultValue("2024-12-04T18:00:00.000Z")]
         public DateTime EndTime{get;set;}
-        [DefaultValue("00:00:00")]
+        [DefaultValue("00:00")]
         public TimeSpan MeetingTime{get;set;}
-        [DefaultValue("00:00:00")]
+        [DefaultValue("00:00")]
         public TimeSpan tijdWeg{get;set;}
     }
 }

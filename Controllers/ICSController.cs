@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using ITCCLMBSSA_API.Models;
 using ITCCLMBSSA_API.Models.misc;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace ITCCLMBSSA_API.Controllers{
 
@@ -11,7 +12,7 @@ namespace ITCCLMBSSA_API.Controllers{
 
         [HttpPost]
         [Route("GetAvailability")]
-        public async Task<ActionResult<List<Availability>>> GetAvailability(APIAvailability availability){
+        public async Task<ActionResult<List<Availability>>> GetAvailability(APIAvailability availability, [FromQuery] string? bearerToken){
             try{
             //Checkt of emails correct format zijn
             foreach(var ma in availability.emails){
@@ -23,14 +24,37 @@ namespace ITCCLMBSSA_API.Controllers{
             var XOAcontr = new XOutlookApiController();
             var SPcontr = new SubProgramma();
 
-            //Haalt Bearer token op vanaf Microsoft
-            var Bearer = await XOAcontr.GetBearerToken();
-            if(!availability.emails.Contains(Bearer.userName)){
-                availability.emails.Add(Bearer.userName);
+            AccessTokenReturn Bearer = null;
+            if(bearerToken == null){
+                Bearer = await XOAcontr.GetBearerToken();
+                
             }
+            else{
+                var handler = new JwtSecurityTokenHandler();
+                var jwtSecurityToken = handler.ReadJwtToken(bearerToken);
+                try{
+                Bearer = new AccessTokenReturn(){
+                    AccessToken = bearerToken,
+                    userName = jwtSecurityToken.Claims.First(x => x.Type == "upn").Value,
+                    expiresOn = jwtSecurityToken.ValidTo
+                };
+                if(Bearer.expiresOn < DateTime.Now){
+                    throw new Exception();
+                }
+                }
+                catch{
+                    Bearer = await XOAcontr.GetBearerToken();
+                }
+            }
+            if(!availability.emails.Contains(Bearer.userName)){
+                    availability.emails.Add(Bearer.userName);
+                }
+
+            //Haalt Bearer token op vanaf Microsoft
+            
 
             //Formateert alle input voor API call
-            var postItem = SPcontr.EmailPost(Bearer.userName, availability);
+            var postItem = SPcontr.EmailPost(availability);
 
             //API call naar Outlook API voor data wie wanneer bezet is
             var ret = await XOAcontr.GetSchedule(postItem, Bearer.AccessToken);
