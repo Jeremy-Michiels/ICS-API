@@ -31,7 +31,8 @@ public class SubProgramma{
                 int i = 1;
                 ScheduleItem prev = null;
                 foreach(var sched in item.scheduleItems){
-                    if(sched.end.dateTime.TimeOfDay.Hours == 16){
+                    if(item.scheduleId == "jacco.schonewille@clmbs.nl" && sched.end.dateTime.TimeOfDay == TimeSpan.Parse("17:00:00")){
+                        Console.WriteLine("test");
                     }
                     if(prev == null && i == 1){
                         if(sched.start.dateTime.TimeOfDay > item.workingHours.startTime){
@@ -53,7 +54,14 @@ public class SubProgramma{
                                 compareList.Add(CompareAdd(item.scheduleId, prev.end.dateTime.Date,prev.end.dateTime.TimeOfDay,item.workingHours.endTime));                                
                             }
                             if(sched.start.dateTime.TimeOfDay > item.workingHours.startTime){
-                                compareList.Add(CompareAdd(item.scheduleId, sched.start.dateTime.Date,item.workingHours.endTime,sched.start.dateTime.TimeOfDay));                                
+                                if(prev.end.dateTime.Date == sched.start.dateTime.Date){
+                                    compareList.Add(CompareAdd(item.scheduleId, sched.start.dateTime.Date,item.workingHours.endTime,sched.start.dateTime.TimeOfDay));
+                                }
+                                else{
+                                    compareList.Add(CompareAdd(item.scheduleId, sched.start.dateTime.Date, item.workingHours.startTime, sched.start.dateTime.TimeOfDay));
+                                }
+
+                                                                
                             }
                         }
                     }
@@ -62,6 +70,12 @@ public class SubProgramma{
                     prev = sched;
                     i++;
                 }
+            }
+            foreach(var d in disDates){
+                if(!compareList.Where(x => x.email == item.scheduleId).Select(x => x.datum).Contains(d)){
+                    compareList.Add(CompareAdd(item.scheduleId, d, item.workingHours.startTime, item.workingHours.endTime));
+                }
+
             }
         }
         return compareList;
@@ -95,6 +109,7 @@ public class SubProgramma{
                 var planned = ret.value.SingleOrDefault(x => x.scheduleId == user).scheduleItems;
 
                 foreach (var busyTimes in planned){
+                    if(busyTimes.start.dateTime.Date == sub.datum.Date || busyTimes.end.dateTime.Date == sub.datum.Date){
                     //Checken of de tijden van de meeting overlappen met deze vrijgeroosterde tijd
                     if((busyTimes.start.dateTime.TimeOfDay <= item.startTijd && busyTimes.end.dateTime.TimeOfDay >= item.startTijd) || (busyTimes.start.dateTime.TimeOfDay <= item.eindTijd && busyTimes.end.dateTime.TimeOfDay >= item.eindTijd) || (busyTimes.start.dateTime.TimeOfDay >= item.startTijd && busyTimes.end.dateTime.TimeOfDay <= item.eindTijd) || (busyTimes.start.dateTime.TimeOfDay <= item.startTijd && busyTimes.end.dateTime.TimeOfDay >= item.eindTijd)){
                                     i = 0;
@@ -106,6 +121,10 @@ public class SubProgramma{
                         i++;
 
                     }
+                }
+                else{
+                    i++;
+                }
                 }
                 if(i == planned.Count()){
                     sub.attendees.Add(user);
@@ -346,7 +365,7 @@ public class SubProgramma{
     //     }
     // }
     public static Compare CompareAdd(string email, DateTime datum, TimeSpan starttijd, TimeSpan eindtijd){
-            Console.WriteLine("Beschikbaar op " + datum.ToString("d")+ " van " + starttijd + " tot " + eindtijd);
+            Console.WriteLine(email + " Beschikbaar op " + datum.ToString("d")+ " van " + starttijd + " tot " + eindtijd);
             return new Compare{
                             email = email,
                             datum = datum,
