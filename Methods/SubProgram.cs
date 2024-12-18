@@ -31,9 +31,7 @@ public class SubProgramma{
                 int i = 1;
                 ScheduleItem prev = null;
                 foreach(var sched in item.scheduleItems){
-                    if(item.scheduleId == "jacco.schonewille@clmbs.nl" && sched.end.dateTime.TimeOfDay == TimeSpan.Parse("17:00:00")){
-                        Console.WriteLine("test");
-                    }
+                    
                     if(prev == null && i == 1){
                         if(sched.start.dateTime.TimeOfDay > item.workingHours.startTime){
                             compareList.Add(CompareAdd(item.scheduleId, sched.start.dateTime.Date,item.workingHours.startTime,sched.start.dateTime.TimeOfDay));
