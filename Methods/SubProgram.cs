@@ -64,17 +64,25 @@ public class SubProgramma{
                         }
                     }
 
+                    if(item.scheduleItems.Last() == sched && sched.end.dateTime.TimeOfDay < item.workingHours.endTime){
+                        var l = CompareAdd(item.scheduleId, sched.end.dateTime.Date, sched.end.dateTime.TimeOfDay, item.workingHours.endTime);
+                        if(compareList.Where(x => x.email == l.email && x.datum == l.datum && x.startTijd == l.startTijd && x.eindTijd == l.eindTijd).Count() < 1){
+                            compareList.Add(l);
+                        }
+                    }
+
 
                     prev = sched;
                     i++;
                 }
-            }
-            foreach(var d in disDates){
-                if(!compareList.Where(x => x.email == item.scheduleId).Select(x => x.datum).Contains(d)){
+                foreach(var d in disDates){
+                if(!compareList.Where(x => x.email == item.scheduleId).Select(x => x.datum).Contains(d.Date)){
                     compareList.Add(CompareAdd(item.scheduleId, d, item.workingHours.startTime, item.workingHours.endTime));
                 }
 
             }
+            }
+            
         }
         return compareList;
     }
@@ -89,10 +97,15 @@ public class SubProgramma{
     public  List<Availability> Availabilities(ITCCLMBSSA_API.Models.GetSchedule.Return ret, List<Compare> compareList, TimeSpan time, TimeSpan tijdWeg){
         var users = ret.value.Select(x => x.scheduleId).Distinct().ToList();
         var availability = new List<Availability>();
+        var halfUur = TimeSpan.Parse("00:30");
         foreach(var item in compareList){
-            if(availability.Where(x => x.startTijd == item.startTijd && x.eindTijd == item.eindTijd).Count() == 0){
+            var user = ret.value.Where(x => x.scheduleId == item.email).First();
+            if(item.email == "jeremy.michiels@clmbs.nl"){
+                Console.WriteLine();
+            }
+            if(availability.Where(x => x.startTijd == item.startTijd && x.eindTijd == item.eindTijd && x.datum == item.datum).Count() == 0){
             var sub = new Availability(){
-                datum = item.datum,
+                datum = item.datum.Date,
                 startTijd = item.startTijd,
                 eindTijd = item.eindTijd,
                 attendees = new List<string>(){
@@ -101,7 +114,56 @@ public class SubProgramma{
                 genoegTijd = item.eindTijd - item.startTijd >= time,
                 genoegMetReistijd = item.eindTijd - item.startTijd >= time + tijdWeg
             };
-            foreach(var user in users.Where(x => x != item.email)){
+            sub = returnSub(sub, ret);
+            if(sub.genoegMetReistijd && !sub.allAvailable && time + tijdWeg + halfUur <= sub.eindTijd - sub.startTijd){
+                var newSub = new Availability{
+                    startTijd = sub.startTijd,
+                    eindTijd = sub.startTijd + time,
+                    datum = sub.datum.Date,
+                    attendees = new List<string>{
+                        item.email
+                    },
+                    genoegTijd = true,
+                    genoegMetReistijd = true,
+                    isSub = true,
+                };
+                
+                while(newSub.eindTijd <=sub.eindTijd && user.workingHours.endTime >= sub.eindTijd){
+                    
+                    newSub = returnSub(newSub, ret);
+                    if(newSub.allAvailable && availability.Where(x => x.datum == newSub.datum && x.startTijd == newSub.startTijd && x.eindTijd == newSub.eindTijd).Count() < 1){
+                        availability.Add(new Availability{
+                                    datum = newSub.datum,
+                                    startTijd = newSub.startTijd,
+                                    eindTijd = newSub.eindTijd,
+                                    attendees = newSub.attendees,
+                                    allAvailable = newSub.allAvailable,
+                                    genoegTijd = newSub.genoegTijd,
+                                    genoegMetReistijd = newSub.genoegMetReistijd,
+                                    isSub = newSub.isSub
+                        });
+                    }
+                    newSub.startTijd = newSub.startTijd + halfUur;
+                    newSub.eindTijd = newSub.startTijd + time + tijdWeg;
+                    newSub.attendees = new List<string>{
+                        item.email
+                    };
+                    newSub.allAvailable = false;
+                    
+                }
+            }
+            availability.Add(sub);
+            }
+            
+                
+        }
+        return availability.OrderBy(x => DateTime.Parse(x.datum.ToShortDateString() + " " + x.startTijd.ToString())).ToList();;
+    }
+
+    //Methode die meerdere subs afmeet tegenover "drukke tijden"
+    public Availability returnSub(Availability sub, ITCCLMBSSA_API.Models.GetSchedule.Return ret){
+        var users = ret.value.Select(x => x.scheduleId).Distinct().ToList();
+        foreach(var user in users){
 
                 int i = 0;
                 var planned = ret.value.SingleOrDefault(x => x.scheduleId == user).scheduleItems;
@@ -109,11 +171,9 @@ public class SubProgramma{
                 foreach (var busyTimes in planned){
                     if(busyTimes.start.dateTime.Date == sub.datum.Date || busyTimes.end.dateTime.Date == sub.datum.Date){
                     //Checken of de tijden van de meeting overlappen met deze vrijgeroosterde tijd
-                    if((busyTimes.start.dateTime.TimeOfDay <= item.startTijd && busyTimes.end.dateTime.TimeOfDay >= item.startTijd) || (busyTimes.start.dateTime.TimeOfDay <= item.eindTijd && busyTimes.end.dateTime.TimeOfDay >= item.eindTijd) || (busyTimes.start.dateTime.TimeOfDay >= item.startTijd && busyTimes.end.dateTime.TimeOfDay <= item.eindTijd) || (busyTimes.start.dateTime.TimeOfDay <= item.startTijd && busyTimes.end.dateTime.TimeOfDay >= item.eindTijd)){
+                    if((busyTimes.start.dateTime.TimeOfDay <= sub.startTijd && busyTimes.end.dateTime.TimeOfDay > sub.startTijd) || (busyTimes.start.dateTime.TimeOfDay < sub.eindTijd && busyTimes.end.dateTime.TimeOfDay >= sub.eindTijd) || (busyTimes.start.dateTime.TimeOfDay > sub.startTijd && busyTimes.end.dateTime.TimeOfDay < sub.eindTijd) || (busyTimes.start.dateTime.TimeOfDay < sub.startTijd && busyTimes.end.dateTime.TimeOfDay > sub.eindTijd)){
                                     i = 0;
                                     break;
-
-                        
                     }
                     else{
                         i++;
@@ -124,7 +184,7 @@ public class SubProgramma{
                     i++;
                 }
                 }
-                if(i == planned.Count()){
+                if(i == planned.Count() && !sub.attendees.Contains(user)){
                     sub.attendees.Add(user);
                     if(sub.attendees.Count() == users.Count()){
                         sub.allAvailable = true;
@@ -133,12 +193,7 @@ public class SubProgramma{
                 else{
                 }
             }
-            availability.Add(sub);
-            }
-            
-                
-        }
-        return availability;
+            return sub;
     }
 
 
@@ -363,7 +418,6 @@ public class SubProgramma{
     //     }
     // }
     public static Compare CompareAdd(string email, DateTime datum, TimeSpan starttijd, TimeSpan eindtijd){
-            Console.WriteLine(email + " Beschikbaar op " + datum.ToString("d")+ " van " + starttijd + " tot " + eindtijd);
             return new Compare{
                             email = email,
                             datum = datum,

@@ -64,7 +64,7 @@ namespace ITCCLMBSSA_API.Controllers{
 
             //Wie zijn op dezelfde tijden beschikbaar
             var ava = SPcontr.Availabilities(ret, free, availability.MeetingTime, availability.tijdWeg);
-            return ava.Where(x => x.allAvailable == true).ToList();
+            return ava.Where(x => x.allAvailable == true && x.genoegMetReistijd == true).ToList();
             }
             catch(Exception e){
                 return StatusCode(500, e.Message);
