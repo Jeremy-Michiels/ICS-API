@@ -100,10 +100,7 @@ public class SubProgramma{
         var halfUur = TimeSpan.Parse("00:30");
         foreach(var item in compareList){
             var user = ret.value.Where(x => x.scheduleId == item.email).First();
-            if(item.email == "jeremy.michiels@clmbs.nl"){
-                Console.WriteLine();
-            }
-            if(availability.Where(x => x.startTijd == item.startTijd && x.eindTijd == item.eindTijd && x.datum == item.datum).Count() == 0){
+            if(availability.Where(x => x.startTijd == item.startTijd && x.eindTijd == item.eindTijd && x.datum.Date == item.datum.Date).Count() == 0){
             var sub = new Availability(){
                 datum = item.datum.Date,
                 startTijd = item.startTijd,
@@ -128,12 +125,12 @@ public class SubProgramma{
                     isSub = true,
                 };
                 
-                while(newSub.eindTijd <=sub.eindTijd && user.workingHours.endTime >= sub.eindTijd){
+                while(newSub.eindTijd <=sub.eindTijd + tijdWeg && user.workingHours.endTime >= sub.eindTijd){
                     
                     newSub = returnSub(newSub, ret);
                     if(newSub.allAvailable && availability.Where(x => x.datum == newSub.datum && x.startTijd == newSub.startTijd && x.eindTijd == newSub.eindTijd).Count() < 1){
                         availability.Add(new Availability{
-                                    datum = newSub.datum,
+                                    datum = newSub.datum.Date,
                                     startTijd = newSub.startTijd,
                                     eindTijd = newSub.eindTijd,
                                     attendees = newSub.attendees,
@@ -144,7 +141,7 @@ public class SubProgramma{
                         });
                     }
                     newSub.startTijd = newSub.startTijd + halfUur;
-                    newSub.eindTijd = newSub.startTijd + time + tijdWeg;
+                    newSub.eindTijd = newSub.startTijd + time ;
                     newSub.attendees = new List<string>{
                         item.email
                     };
